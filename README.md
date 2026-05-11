@@ -5,7 +5,7 @@
 **Submission:** Solana Colosseum hackathon, May 2026.
 **Live:** see deployment URL on the Vercel project.
 
-This repo is the **slimmed, judging-only build** — a single linear demo at `/colosseum` and the five API routes it needs. The full COLONII product (the `/talk` beta surface, account management, the memory studio, etc.) lives in a separate parent repo and is not part of the Colosseum submission.
+This repo is the **slimmed, judging-only build** — a single linear demo at `/colosseum`, the five API routes it needs, and the imported Solana identity layer that powers the smart-contract handoff. The full COLONII product (the `/talk` beta surface, account management, the memory studio, etc.) lives in a separate parent repo and is not part of the Colosseum submission.
 
 ---
 
@@ -96,7 +96,38 @@ All PDA derivations, SHA-256 memory hashes, DID strings, and identity-record sha
 | Hosting | Vercel (Edge for static, Node for `/api/*`) |
 | Fonts | Alata (display) + Special Elite (body) via next/font |
 
-The Solana SDK in `lib/colonii-sdk/` is vendored byte-identical from [gmxbt/colonii-identity](https://github.com/gmxbt/colonii-identity) so the demo and the real program stay in lock-step.
+The browser-safe Solana SDK in `lib/colonii-sdk/` is mirrored from `sdk/src/` so the demo and the real program stay in lock-step.
+
+---
+
+## On-chain identity layer
+
+The smart-contract handoff code lives in this repo now:
+
+```text
+programs/colonii-identity/   # Anchor program: DID, issuer, credentials, avatar binding, memory anchors
+sdk/                         # TypeScript SDK package for mock/live integration
+demo/                        # CLI demo and localnet program behavior tests
+INTEGRATION_HANDOFF.md       # UI action -> SDK method -> signer -> instruction -> account map
+```
+
+Useful commands:
+
+```bash
+anchor build
+cd sdk && npm test
+cd demo && npm run demo
+```
+
+For localnet program behavior tests, start a validator and deploy the program first:
+
+```bash
+solana-test-validator --reset
+anchor deploy --provider.cluster localnet
+cd demo && SOLANA_RPC_URL=http://127.0.0.1:8899 npm run test:program:localnet
+```
+
+`anchor deploy` must use a deploy keypair whose address matches the declared program ID in `Anchor.toml` and `programs/colonii-identity/src/lib.rs`. Deploy keypairs are not committed; if Anchor generates a fresh one, either provide the approved matching keypair locally or intentionally rotate the program ID across the program, SDK, and app before testing.
 
 ---
 
@@ -172,7 +203,7 @@ app/
 └── layout.tsx                   # Fonts + Vercel Analytics
 
 lib/
-├── colonii-sdk/                 # Vendored from gmxbt/colonii-identity
+├── colonii-sdk/                 # Browser-safe mirror of sdk/src
 ├── characters.ts                # Character lore (synced to Tavus personas)
 └── auth.ts, supabase.ts         # Session + DB helpers
 
@@ -185,8 +216,19 @@ scripts/
 └── provision-personas.ts        # Bulk persona setup
 
 public/
-├── personas/                    # Character portraits (Luke Nugent, May 2026)
+├── personas/                    # Character portraits for the demo cast
 └── elevenlabs-grants-black.webp # Partner credit asset
+
+programs/
+└── colonii-identity/            # Anchor smart contract (Rust)
+
+sdk/
+└── src/                         # Upstream TypeScript SDK (live-mode client + IDL)
+
+demo/
+└── src/                         # CLI demo + localnet behavior tests
+
+Anchor.toml, Cargo.toml, Cargo.lock # Anchor workspace at the repo root
 ```
 
 ---
@@ -201,7 +243,7 @@ public/
 - **Avatar replicas:** [Tavus](https://tavus.io)
 - **Real-time WebRTC:** [Daily.co](https://www.daily.co)
 - **Inference:** Groq, OpenRouter, Google, OpenAI
-- **Solana SDK:** [gmxbt/colonii-identity](https://github.com/gmxbt/colonii-identity)
+- **Solana identity layer:** Anchor program in `programs/colonii-identity/` and SDK in `sdk/`
 
 ---
 
