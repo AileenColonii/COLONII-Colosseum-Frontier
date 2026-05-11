@@ -1,0 +1,39 @@
+{
+  "name": "@colonii/identity-sdk",
+  "version": "0.1.0",
+  "description": "TypeScript SDK for the COLONII on-chain identity layer (DIDs, Verifiable Credentials, memory anchors).",
+  "main": "dist/index.js",
+  "module": "dist-esm/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist", "dist-esm", "src"],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist-esm/index.js",
+      "require": "./dist/index.js"
+    },
+    "./browser": {
+      "types": "./dist/browser.d.ts",
+      "import": "./dist-esm/browser.js",
+      "require": "./dist/browser.js"
+    }
+  },
+  "scripts": {
+    "build": "npm run build:cjs && npm run build:esm",
+    "build:cjs": "tsc",
+    "build:esm": "tsc -p tsconfig.esm.json",
+    "test": "npm run build && node --test test/*.test.js",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist dist-esm"
+  },
+  "dependencies": {
+    "@coral-xyz/anchor": "^0.32.1",
+    "@noble/hashes": "^1.4.0",
+    "@solana/web3.js": "^1.95.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "typescript": "^5.4.0"
+  },
+  "license": "Apache-2.0"
+}

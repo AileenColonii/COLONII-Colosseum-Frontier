@@ -4,10 +4,16 @@ node_modules/
 # build output
 .next/
 out/
+target/
+.anchor/
+test-ledger/
 
 # secrets — match anything starting with .env, but allow the safe template
 .env*
 !.env.local.example
+*-keypair.json
+*.pem
+*.key
 
 # Vercel project metadata + pulled envs
 .vercel/
@@ -27,6 +33,10 @@ Thumbs.db
 # Logs / build cache
 *.log
 tsconfig.tsbuildinfo
+*.tsbuildinfo
+sdk/dist/
+sdk/dist-esm/
+demo/dist/
 .omc/
 .deck-onchain.pdf
 .deck-beta.pdf
