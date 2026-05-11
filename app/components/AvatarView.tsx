@@ -8,6 +8,16 @@ interface AvatarViewProps {
   connecting?: boolean;
   onStateChange: (state: "idle" | "listening" | "thinking" | "speaking") => void;
   onError?: (message: string) => void;
+  /**
+   * Called when the user clicks the "Type instead" escape hatch from
+   * the connecting overlay. Surfaced after 10s of unconnected state,
+   * because the most common live-demo failure mode is the Pipecat
+   * bot-server being unreachable — the iframe stays connected, but
+   * Anja never appears. Without this, the user is trapped on the
+   * "Connecting to Anja…" overlay with no way to fall through to the
+   * working text chat tier.
+   */
+  onUserRequestChat?: () => void;
 }
 
 const CONNECTING_LINES = [
@@ -37,7 +47,7 @@ const CONNECTING_LINES = [
  * - DailyTransport sends both audio + video to this browser client via WebRTC
  * - This component just joins the Daily room and renders the video track
  */
-export default function AvatarView({ roomUrl, token, connecting, onStateChange, onError }: AvatarViewProps) {
+export default function AvatarView({ roomUrl, token, connecting, onStateChange, onError, onUserRequestChat }: AvatarViewProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const dailyRef = useRef<any>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -48,6 +58,11 @@ export default function AvatarView({ roomUrl, token, connecting, onStateChange, 
   const [showUnmute, setShowUnmute] = useState(false);
   const userInteractedRef = useRef(false);
   const unmuteDismissedRef = useRef(false);
+  // Show the "Type instead" escape after 10s of unconnected state.
+  // Demo flow: judge sees connecting overlay for a beat (charming), but
+  // if Anja still isn't speaking after 10s we surface a clearly-visible
+  // way out so the demo never deadlocks.
+  const [showChatEscape, setShowChatEscape] = useState(false);
 
   // Mirror callbacks in refs so the connect effect doesn't depend on
   // their identities. Without this, every parent re-render (memory
@@ -79,6 +94,18 @@ export default function AvatarView({ roomUrl, token, connecting, onStateChange, 
     const t = setTimeout(() => setAudioReady(true), 8000);
     return () => clearTimeout(t);
   }, [videoReady, audioReady]);
+
+  // Surface the "Type instead" escape after 10s of unconnected state.
+  // Only reveal it if a chat callback is wired — otherwise it'd be a
+  // dead button.
+  useEffect(() => {
+    if (connected || !onUserRequestChat) {
+      setShowChatEscape(false);
+      return;
+    }
+    const t = setTimeout(() => setShowChatEscape(true), 10_000);
+    return () => clearTimeout(t);
+  }, [connected, onUserRequestChat]);
 
   // H1: track user interaction for Safari autoplay detection
   useEffect(() => {
@@ -272,6 +299,16 @@ export default function AvatarView({ roomUrl, token, connecting, onStateChange, 
           <span className="connecting-line" key={lineIndex}>
             {CONNECTING_LINES[lineIndex]}
           </span>
+          {showChatEscape && onUserRequestChat && (
+            <button
+              type="button"
+              onClick={onUserRequestChat}
+              className="chat-escape"
+              aria-label="Skip video and chat with Anja in text instead"
+            >
+              Anja taking too long? <span className="chat-escape-cta">Type with her instead →</span>
+            </button>
+          )}
         </div>
       )}
 
@@ -398,6 +435,36 @@ export default function AvatarView({ roomUrl, token, connecting, onStateChange, 
         .unmute-pill:hover {
           background: rgba(14, 242, 131, 0.12);
           border-color: rgba(14, 242, 131, 0.7);
+        }
+        /* Escape hatch that fades in after 10s of unconnected state.
+           Visible enough to read at presenter distance but quiet enough
+           to not yell at the user when video does eventually arrive. */
+        .chat-escape {
+          margin-top: 8px;
+          background: transparent;
+          color: rgba(220, 220, 220, 0.7);
+          border: 1px solid rgba(14, 242, 131, 0.4);
+          border-radius: 999px;
+          padding: 8px 18px;
+          font-size: 13px;
+          letter-spacing: 0.02em;
+          cursor: pointer;
+          transition: background 0.2s, border-color 0.2s, color 0.2s;
+          animation: chat-escape-in 0.6s ease forwards;
+        }
+        .chat-escape:hover {
+          background: rgba(14, 242, 131, 0.08);
+          border-color: rgba(14, 242, 131, 0.8);
+          color: rgba(255, 255, 255, 0.95);
+        }
+        .chat-escape-cta {
+          color: rgba(14, 242, 131, 0.95);
+          font-weight: 500;
+          margin-left: 6px;
+        }
+        @keyframes chat-escape-in {
+          from { opacity: 0; transform: translateY(6px); }
+          to { opacity: 1; transform: translateY(0); }
         }
         @keyframes line-fadein {
           from { opacity: 0; transform: translateY(6px); }

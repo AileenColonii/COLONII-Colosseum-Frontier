@@ -31,3 +31,5 @@ tsconfig.tsbuildinfo
 .deck-onchain.pdf
 .deck-beta.pdf
 .deck-pages/
+
+.vercel

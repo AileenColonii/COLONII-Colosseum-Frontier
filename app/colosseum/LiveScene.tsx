@@ -262,6 +262,13 @@ export default function LiveScene({
   useEffect(() => {
     if (mode !== "chat") return;
     let cancelled = false;
+    // Hard 15s safety: if the greeting fetch or its stream stalls (rare,
+    // but breaks the demo loudly), abort and show a scripted greeting so
+    // the user always sees Anja saying something on entry.
+    const controller = new AbortController();
+    const safety = window.setTimeout(() => {
+      controller.abort();
+    }, 15_000);
     (async () => {
       setSending(true);
       try {
@@ -273,6 +280,7 @@ export default function LiveScene({
             model: "groq",
             history: [],
           }),
+          signal: controller.signal,
         });
         if (!res.ok || !res.body) {
           if (!cancelled) {
@@ -309,6 +317,8 @@ export default function LiveScene({
     })();
     return () => {
       cancelled = true;
+      window.clearTimeout(safety);
+      controller.abort();
     };
   }, [mode]);
 
@@ -493,6 +503,22 @@ export default function LiveScene({
                   // Surface but do NOT auto-fallback once video is up —
                   // a transient blip shouldn't yank the user to chat.
                   setError(`Video: ${m}`);
+                }}
+                onUserRequestChat={() => {
+                  // 2026-05-11 Sam reported the demo deadlocking on the
+                  // "Connecting to Anja…" overlay when the Pipecat bot
+                  // server isn't reachable. AvatarView surfaces this
+                  // button after 10s of unconnected state; clicking it
+                  // ends the Tavus conversation (stops billing) and
+                  // hands the user off to the text-chat tier, which
+                  // /api/chat already serves cleanly with the right
+                  // Anja + COLONII personality.
+                  const convId = conversationIdRef.current;
+                  if (convId) endConversation(convId);
+                  conversationIdRef.current = null;
+                  setRoomUrl(null);
+                  setToken(null);
+                  setMode("chat");
                 }}
               />
               <div style={S.videoCaption}>
