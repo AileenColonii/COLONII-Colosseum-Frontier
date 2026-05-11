@@ -1,0 +1,5 @@
+pipecat-ai[daily,deepgram,groq,openai,elevenlabs,silero]==0.0.108
+loguru==0.7.3
+python-dotenv==1.0.1
+aiohttp==3.13.4
+Pillow==11.2.1

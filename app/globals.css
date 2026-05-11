@@ -1,0 +1,434 @@
+/* ── Design tokens ───────────────────────────────────────
+   Palette: pure black + holographic accents + neon green.
+   Per Sam's mockup spec (May 2026). The neon green pulls the demo
+   out of "premium dark theme" land and into "Colony broadcast" — a
+   coded signal that reads as alive, electric, and slightly futurist
+   without going crypto-gold.
+*/
+:root {
+  --bg:          #000000;        /* pure black (per spec) */
+  --bg-surface:  #0A0A0A;        /* near-black for lifted surfaces */
+  --text:        #FFFFFF;        /* clean white (no warm tint anymore) */
+  --text-muted:  rgba(255,255,255,0.65);  /* AA on black */
+  --text-faint:  rgba(255,255,255,0.45);  /* AA on black */
+  --accent:      #0EF283;        /* neon green — new COLONII signal */
+  --accent-dim:  rgba(14,242,131,0.16);
+  --accent-glow: rgba(14,242,131,0.10);
+  --border:      rgba(255,255,255,0.10);   /* thin white outline per spec */
+  --border-warm: rgba(14,242,131,0.30);
+  --border-bright: rgba(255,255,255,0.20); /* slightly brighter for selected/active */
+
+  /* Holographic — used for hero scenes + wordmark. A wash of soft
+     iridescent gradient that reads as alive without being noisy. */
+  --holographic: linear-gradient(
+    135deg,
+    rgba(14,242,131,0.10) 0%,
+    rgba(140,200,255,0.08) 25%,
+    rgba(200,140,255,0.10) 50%,
+    rgba(255,180,140,0.08) 75%,
+    rgba(14,242,131,0.10) 100%
+  );
+
+  /* Semantic */
+  --on-accent:    #000000;        /* black ink on neon green (AAA contrast) */
+  --success:      #0EF283;        /* success = the accent itself */
+  --success-glow: rgba(14,242,131,0.6);
+  --error:        #FF6B6B;
+  --error-bg:     rgba(255,107,107,0.08);
+  --error-border: rgba(255,107,107,0.3);
+  --scrim:        rgba(0,0,0,0.65);
+
+  /* Personas keep their identity colours — they're characters, not
+     theme tokens. Anja gets the new accent green; the others stay in
+     their distinct registers. */
+  --persona-anja:  #0EF283;
+  --persona-hung:  #6E8FB6;
+  --persona-grace: #B89FCC;
+  --persona-leon:  #6FBFA8;
+}
+
+/* ── Reset ─────────────────────────────────────────────── */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  width: 100%;
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#__next {
+  width: 100%;
+  height: 100%;
+}
+
+/* ── Focus ─────────────────────────────────────────────── */
+*:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ── Disabled cursor (audit H5) ────────────────────────── */
+button[disabled],
+button[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
+/* ── Utilities ─────────────────────────────────────────── */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* ── Range slider ──────────────────────────────────────── */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  border: none;
+}
+input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  border: none;
+}
+
+/* ── Time input ────────────────────────────────────────── */
+input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) brightness(0.7);
+}
+
+/* ── Visually hidden (for screen-reader-only labels) ───── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── Colosseum demo: responsive grids (audit H3) ───────── */
+@media (max-width: 920px) {
+  [data-colosseum-chat] {
+    grid-template-columns: minmax(0, 1fr) !important;
+    height: auto !important;
+  }
+  [data-colosseum-chat] > aside {
+    display: none !important;
+  }
+}
+
+/* H6: Mobile Safari fix — LiveScene grid collapses the 320px right rail
+   below the video on narrow viewports to prevent it from crushing the
+   video column. The aside is hidden entirely since it adds no value at
+   this width (identity pills are visible in the header pill instead). */
+@media (max-width: 768px) {
+  [data-colosseum-chat] {
+    grid-template-columns: 1fr !important;
+    height: auto !important;
+  }
+  [data-colosseum-chat] > aside {
+    display: none !important;
+  }
+}
+
+@media (max-width: 800px) {
+  [data-colosseum-grid="roadmap"] {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  [data-colosseum-grid="dashboard"] {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  /* Editorial dashboard split → stacked on small viewports */
+  [data-colosseum-shell] [data-dash-split] {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  [data-colosseum-shell] [data-dash-secondary] {
+    border-left: none !important;
+    padding-left: 0 !important;
+    border-top: 1px solid var(--border);
+    padding-top: 18px;
+  }
+  [data-colosseum-shell] [data-dash-header] {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  /* Cast spread: collapse rail + feature into stacked column */
+  [data-colosseum-shell] [data-cast-split] {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 24px !important;
+  }
+  [data-colosseum-shell] [data-cast-feature] {
+    border-left: none !important;
+    padding-left: 0 !important;
+    border-top: 1px solid var(--border);
+    padding-top: 24px;
+  }
+}
+
+@media (max-width: 640px) {
+  [data-colosseum-grid="avatars"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  [data-colosseum-grid="memories"] {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  [data-colosseum-grid="slots"] {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+  [data-colosseum-shell] {
+    padding: 24px 16px !important;
+  }
+}
+
+/* Pill overlap fix at small widths (audit L1): the wallet pill and demo
+   status pill both anchor near top — stack them vertically when there's
+   no horizontal room. */
+@media (max-width: 480px) {
+  [data-colosseum-shell] [data-pill-wallet] {
+    top: 8px !important;
+    left: 8px !important;
+    right: 8px !important;
+    width: max-content;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  [data-colosseum-shell] [data-pill-demo] {
+    top: 44px !important;
+    right: 8px !important;
+  }
+}
+
+/* ── Solana wallet-adapter modal ─────────────────────────────────────
+   Re-skin to match Aileen's slide 5 of the May-10 deck:
+     - Pure-black card with a thin green ring + soft outer halo.
+     - Title in the body typewriter font ("Connect a wallet on Solana
+       to continue" — the default copy shipped by recent versions of
+       wallet-adapter-react-ui).
+     - Wallet list collapses from a vertical list into a centered
+       row of icon-only circles. Each icon gets a halo glow and a
+       green ring on hover.
+
+   We override the wallet-adapter-react-ui public class names with
+   high-specificity `!important` rules because the bundled stylesheet
+   uses `!important` itself. Selectors stay defensive: anything that
+   targets internals (button content shape, label text) uses
+   visibility tricks rather than DOM assumptions, so a future package
+   version that re-orders nodes still works.
+
+   Accessibility note: the wallet name is visually collapsed (font-
+   size 0 + color transparent) but the underlying text node remains
+   in the DOM. Screen readers still announce "Phantom"/"Solflare" on
+   focus because the button's accessible name comes from its text
+   content. We also expose the wallet name as a CSS-driven hover
+   tooltip via `title` attribute fallback (browser default behaviour
+   on <button>). Icon recognition + native tooltip keep the surface
+   usable for sighted users even without visible labels.
+*/
+
+/* Backdrop — full darken so the modal floats against pure black. */
+.wallet-adapter-modal-overlay {
+  background: rgba(0, 0, 0, 0.78) !important;
+  backdrop-filter: blur(4px) !important;
+}
+
+/* The card itself. Pure black + thin neon ring + dual-layer halo.
+   The outer halo is a soft green wash; the inner is the chromatic
+   holographic gradient our other dark surfaces use, kept at low
+   opacity so it reads as a faint edge glow rather than a wash.
+   MED-7: position:relative is explicitly reasserted so the absolutely-
+   positioned close-X (top:14px; right:14px) remains anchored to this
+   card even if a future package version flattens its default positioning. */
+.wallet-adapter-modal-wrapper {
+  position: relative !important;
+  background: #000 !important;
+  border: 1px solid var(--accent) !important;
+  border-radius: 18px !important;
+  box-shadow:
+    0 0 0 1px rgba(14, 242, 131, 0.18),
+    0 40px 80px -30px rgba(14, 242, 131, 0.28),
+    0 24px 60px -20px rgba(0, 0, 0, 0.95) !important;
+  padding: 28px 32px 32px !important;
+  max-width: 460px !important;
+  font-family: var(--font-body), 'Special Elite', monospace !important;
+}
+
+/* The library renders a "Connect a wallet on Solana to continue"
+   string inside this <h1>. Keep the layout but typeset it in our
+   body face so it visually matches the rest of the demo. */
+.wallet-adapter-modal-title {
+  font-family: var(--font-body), 'Special Elite', monospace !important;
+  color: var(--text) !important;
+  font-size: 17px !important;
+  font-weight: 400 !important;
+  text-align: center !important;
+  letter-spacing: 0.5px !important;
+  line-height: 1.55 !important;
+  padding: 4px 16px 24px !important;
+  margin: 0 !important;
+}
+
+/* Close (×) button — minimal black-on-black with a thin border that
+   greens up on hover. Positioned over the top-right of the card. */
+.wallet-adapter-modal-button-close {
+  background: transparent !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 50% !important;
+  width: 30px !important;
+  height: 30px !important;
+  top: 14px !important;
+  right: 14px !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: border-color 160ms ease, transform 160ms ease !important;
+}
+.wallet-adapter-modal-button-close:hover {
+  border-color: var(--accent) !important;
+  transform: scale(1.04) !important;
+}
+.wallet-adapter-modal-button-close svg {
+  fill: var(--text) !important;
+  width: 12px !important;
+  height: 12px !important;
+}
+
+/* The list of wallets. Default ships as a vertical column with full-
+   width buttons + visible names. We flip it to a centered horizontal
+   row of icon circles to match the deck. */
+.wallet-adapter-modal-list {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: center !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 20px !important;
+  margin: 0 !important;
+  padding: 4px 0 8px !important;
+  list-style: none !important;
+}
+
+.wallet-adapter-modal-list-item,
+.wallet-adapter-modal-list li {
+  list-style: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Icon-only button. We collapse the wallet-name text-node with
+   `font-size: 0` and `color: transparent` (the icon img has fixed px
+   sizing so it survives). The button itself becomes a 64×64 circle. */
+.wallet-adapter-modal-list .wallet-adapter-button {
+  background: transparent !important;
+  border: 1px solid transparent !important;
+  color: transparent !important;
+  font-size: 0 !important;
+  width: 64px !important;
+  height: 64px !important;
+  min-height: 64px !important;
+  border-radius: 50% !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: relative !important;
+  cursor: pointer !important;
+  /* Subtle white glow so dark wallet logos pop on pure black. */
+  box-shadow: 0 0 28px rgba(255, 255, 255, 0.07),
+              inset 0 0 0 1px rgba(255, 255, 255, 0.04) !important;
+  transition: transform 200ms ease, box-shadow 200ms ease,
+              border-color 200ms ease !important;
+}
+.wallet-adapter-modal-list .wallet-adapter-button:hover {
+  background: transparent !important;
+  border-color: var(--accent) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 0 36px rgba(14, 242, 131, 0.35),
+              inset 0 0 0 1px rgba(14, 242, 131, 0.18) !important;
+}
+.wallet-adapter-modal-list .wallet-adapter-button:focus-visible {
+  outline: 2px solid var(--accent) !important;
+  outline-offset: 4px !important;
+}
+
+/* Icon container + the icon itself. Size up the icon so it fills
+   most of the circle. */
+.wallet-adapter-modal-list .wallet-adapter-button-start-icon {
+  background: transparent !important;
+  width: 44px !important;
+  height: 44px !important;
+  margin: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+.wallet-adapter-modal-list .wallet-adapter-button-start-icon img,
+.wallet-adapter-modal-list .wallet-adapter-button-start-icon svg {
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 50% !important;
+  display: block !important;
+}
+
+/* Hide the "Detected" badge — visually noisy on the icon-row layout
+   and the deck doesn't show it. */
+.wallet-adapter-modal-list .wallet-adapter-button-end-icon {
+  display: none !important;
+}
+
+/* "More options" link (collapsed wallet list expander). Keep visible
+   in case more adapters get registered later; subtle green link. */
+.wallet-adapter-modal-list-more {
+  display: block !important;
+  color: var(--accent) !important;
+  font-family: var(--font-body), 'Special Elite', monospace !important;
+  font-size: 12px !important;
+  text-align: center !important;
+  margin: 24px auto 0 !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 6px 12px !important;
+  cursor: pointer !important;
+  letter-spacing: 0.4px !important;
+}
+.wallet-adapter-modal-list-more:hover {
+  text-decoration: underline !important;
+}
+.wallet-adapter-modal-list-more svg {
+  fill: var(--accent) !important;
+  margin-left: 4px !important;
+}
+
+/* "Already have a wallet?" trigger button (used in some flows). */
+.wallet-adapter-button-trigger {
+  background: var(--accent) !important;
+  color: var(--on-accent) !important;
+  font-family: var(--font-body), 'Special Elite', monospace !important;
+  border-radius: 999px !important;
+}
+
+/* ── Reduced-motion override (audit C2) ────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
