@@ -1,0 +1,35 @@
+{
+  "name": "colonii-colosseum",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@daily-co/daily-js": "^0.89.0",
+    "@noble/hashes": "^1.8.0",
+    "@solana/wallet-adapter-base": "^0.9.27",
+    "@solana/wallet-adapter-react": "^0.15.39",
+    "@solana/wallet-adapter-react-ui": "^0.9.39",
+    "@solana/wallet-adapter-wallets": "^0.19.38",
+    "@solana/web3.js": "^1.98.4",
+    "@supabase/supabase-js": "^2.99.2",
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/blob": "^2.3.2",
+    "bcryptjs": "^3.0.3",
+    "framer-motion": "^12.36.0",
+    "next": "^14.2.0",
+    "ogl": "^1.0.11",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "typescript": "^5.4.0"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "name": "@colonii/identity-demo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "End-to-end walkthrough of the COLONII identity SDK. Run `pnpm run demo` (or yarn/npm equivalent).",
+  "scripts": {
+    "demo": "ts-node src/demo.ts",
+    "demo:live": "ts-node src/demo.ts --live",
+    "test:program:localnet": "ts-node src/program-behavior.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@colonii/identity-sdk": "file:../sdk",
+    "@coral-xyz/anchor": "^0.32.1",
+    "@solana/web3.js": "^1.95.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.0"
+  }
+}
