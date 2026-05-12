@@ -1,0 +1,39 @@
+# dependencies
+node_modules/
+
+# build output
+.next/
+out/
+
+# secrets — match anything starting with .env, but allow the safe template
+.env*
+!.env.local.example
+
+# Vercel project metadata + pulled envs
+.vercel/
+
+# Python venv (server/)
+server/venv/
+__pycache__/
+*.pyc
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# Logs / build cache
+*.log
+tsconfig.tsbuildinfo
+.omc/
+.deck-onchain.pdf
+.deck-beta.pdf
+.deck-pages/
+
+.vercel
+
+# Internal-only directories — never ship in the public repo.
+docs/
+.scripts-tmp/
